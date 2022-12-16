@@ -266,12 +266,35 @@ Compare this to our jQuery callback hell. Not much of benefit w/Axios right now.
 So what is the real advantage of Promises?
 
 ### Promise Chaining
-* When you call .then on a promise, you can return new promise in the callback!
+Okay, I can still nest lots of callback functions inside my .then and .catch. But it's an anti-pattern. The solution to all this is "Promise Chaining."
+
+* When you call .then on a promise, you can return new promise in the callback! (Makes NO SENSE RIGHT NOW. I get it.)
 * This means you can chain multiple asynchronous operations together with several .then calls.
 * When using this pattern, you only need one .catch at the end. You don’t have to catch every promise individually.
 
-Okay, I can still nest lots of callback functions inside my .then and .catch. But it's an anti-pattern. The solution to all this is "Promise Chaining."
 
+```js
+// app-axios.js
+let url = "https://swapi.dev/api/planets/1/"
+// First promise gotta succeed.
+axios.get(url)
+  // this callback gonna run now.
+  .then(res => {
+    console.log(res.data)
+    // returning new promise
+    return axios.get(res.data.residents[0])
+  })
+  // That new promise above got resolved. So we can run new promise(.then)...
+  // Don't need to nest. Just chain.
+  .then(res => {
+    console.log(res.data)
+  })
+  // Don't need multiple catches
+  // One .catch to rule them all
+  .catch(err => console.log("Rejected!! Get that ish outta here! Not in my house!", err))
+```
+Make first promise succeed, second promise fail. See how we only need one catch block? One .catch to rule them all.
 
-
+Google Callback Hell jQuery with Error Handling
+![Callback Hell w/Error Handling](https://miro.medium.com/max/1400/1*OVqGAIx11Mmz6JLKXmU2IQ.png)
 

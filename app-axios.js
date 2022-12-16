@@ -1,7 +1,11 @@
 // app-axios.js
-let url = "https://swapi.dev/api/planets/1/"
-let ourFirstPromise = axios.get(url);
-console.log("Argentina gonna win it all on Sunday!")
-ourFirstPromise.then( (data) => console.log(data))
-ourFirstPromise.catch( (err) => console.log("BUMMER", err))
-console.log("Wait. Nevermind. France gonna win it all on Sunday!")
+let url = "https://swapi.dev/api/planuts/1/"
+axios.get(url)
+  .then(res => {
+    console.log(res.data)
+    return axios.get(res.data.residents[0])
+  })
+  .then(res => {
+    console.log(res.data)
+  })
+  .catch(err => console.log("Rejected!! Get that ish outta here! Not in my house!", err))
