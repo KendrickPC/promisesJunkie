@@ -158,5 +158,120 @@ For years, we dealt with CALLBACK hell. Promises clean up our code and flatten t
 * Not all callbacks are async; you’ll have to consult their docs to tell.
 [MDN Callback Function](https://developer.mozilla.org/en-US/docs/Glossary/Callback_function)
 
+### Promises 
 
-### Promises Intro
+##### What is a Promise?
+A promise is a one-time guarantee of future value.
+Analogy time: I wanna borrow money. The promise is not the result. It's a promise in the future that you'll be able to receive the money I borrowed from you. 
+
+### Working with Promises
+
+#### Our First Promise
+```html
+<!-- axios-index.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Axios Examples</title>
+</head>
+<body>
+  <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+  <script src="app-axios.js"></script>
+</body>
+</html>
+
+```
+```js
+// app-axios.js
+let url = "https://swapi.dev/api/planets/1/"
+let ourFirstPromise = axios.get(url);
+console.log(ourFirstPromise);
+// Promise {<pending>}
+```
+PENDING? WTH! Where's my data? 
+
+### What exactly is a Promise?
+* Promises in JavaScript are objects
+* They are native to the language as of ES2015
+* A promise can be in one of three states:
+    * Pending - It doesn’t yet have a value
+    * Resolved - It has successfully obtained a value
+```js
+console.log(ourFirstPromise) // log in console again. Does it change?
+```
+    * Rejected - It failed to obtain a value for some reason
+```js
+console.log(ourFirstPromise) // log in console again. Does it reject?
+```
+* The only way to access the resolved or rejected value is to chain a method on the end of the promise.
+
+Promise is an object. 
+Takes time for something to go wrong.
+Promise always starts off as pending.
+Having an object that tells us fulfilled/rejected is not helpful. We need to be able to act upon the different states of that promise.
+
+### .then and .catch
+* Promises provide a .then and a .catch, which both accept callbacks.
+* The callback to .then will run if the promise is resolved, and has access to the promise’s resolved value.
+* The callback to .catch will run if the promise is rejected, and typically has access to some reason behind the rejection.
+
+```js
+// app-axios.js
+let url = "https://swapi.dev/api/planets/1/"
+let ourFirstPromise = axios.get(url);
+ourFirstPromise.then( () => console.log("RESOLVED"))
+```
+Cool. Now let's do some error handling.
+```js
+// app-axios.js
+let url = "https://swapi.dev/api/planuts/1/"
+let ourFirstPromise = axios.get(url);
+ourFirstPromise.then( () => console.log("RESOLVED"))
+ourFirstPromise.catch( () => console.log("BUMMER"))
+```
+
+```js
+// app-axios.js
+let url = "https://swapi.dev/api/planuts/1/"
+let ourFirstPromise = axios.get(url);
+ourFirstPromise.then( (data) => console.log(data))
+ourFirstPromise.catch( (err) => console.log("BUMMER", err))
+```
+
+```js
+// app-axios.js
+let url = "https://swapi.dev/api/planets/1/"
+let ourFirstPromise = axios.get(url);
+console.log("Argentina gonna win it all on Sunday!")
+// data.data is super funky
+ourFirstPromise.then( (data) => console.log(data))
+ourFirstPromise.catch( (err) => console.log("BUMMER", err))
+console.log("Wait. Nevermind. France gonna win it all on Sunday!")
+```
+```js
+// app-axios.js
+let url = "https://swapi.dev/api/planets/1/"
+let ourFirstPromise = axios.get(url);
+console.log("Argentina gonna win it all on Sunday!")
+// res.data is less funky
+ourFirstPromise.then( (res) => console.log("res.data: ", res.data))
+ourFirstPromise.catch( (err) => console.log("BUMMER", err))
+console.log("Wait. Nevermind. France gonna win it all on Sunday!")
+```
+
+Compare this to our jQuery callback hell. Not much of benefit w/Axios right now.
+So what is the real advantage of Promises?
+
+### Promise Chaining
+* When you call .then on a promise, you can return new promise in the callback!
+* This means you can chain multiple asynchronous operations together with several .then calls.
+* When using this pattern, you only need one .catch at the end. You don’t have to catch every promise individually.
+
+Okay, I can still nest lots of callback functions inside my .then and .catch. But it's an anti-pattern. The solution to all this is "Promise Chaining."
+
+
+
+
