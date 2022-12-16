@@ -298,3 +298,193 @@ Make first promise succeed, second promise fail. See how we only need one catch 
 Google Callback Hell jQuery with Error Handling
 ![Callback Hell w/Error Handling](https://miro.medium.com/max/1400/1*OVqGAIx11Mmz6JLKXmU2IQ.png)
 
+### Pokemon Callback Hell:
+```js
+let baseURL = "https://pokeapi.co/api/v2/pokemon";
+
+$.ajax(`${baseURL}/1/`, {
+  success: p1 => {
+    console.log(`The first pokemon is ${p1.name}`);
+    $.ajax(`${baseURL}/2/`, {
+      success: p2 => {
+        console.log(`The second pokemon is ${p2.name}`);
+        $.ajax(`${baseURL}/3/`, {
+          success: p3 => {
+            console.log(`The third pokemon is ${p3.name}`);
+          },
+          error: err => console.log(err)
+        });
+      },
+      error: err => console.log(err)
+    });
+  },
+  error: err => console.log(err)
+});
+```
+
+### Pokemon with Promises:
+```js
+// promise chaining with pokemon api
+let baseURL = "https://pokeapi.co/api/v2/pokemon";
+
+axios
+  .get(`${baseURL}/1/`)
+  .then(p1 => {
+    console.log(`The first pokemon is ${p1.data.name}`);
+    return axios.get(`${baseURL}/2/`);
+  })
+  .then(p2 => {
+    console.log(`The second pokemon is ${p2.data.name}`);
+    return axios.get(`${baseURL}/3/`);
+  })
+  .then(p3 => {
+    console.log(`The third pokemon is ${p3.data.name}`);
+  })
+  .catch(err => {
+    console.log(`Oops, there was a problem :( ${err}`);
+  });
+```
+
+### Writing Promises:
+```js
+function wait3Seconds() {
+  return new Promise((resolve, reject) => {
+    setTimeout(resolve, 3000)
+  })
+}
+
+wait3Seconds()
+  .then(() => console.log("ALL DONE!"))
+  .catch(() => console.log("ERROR!"))
+
+console.log("STILL WAITING!")
+
+const h1 = document.querySelector('h1');
+// setTimeout(function () {
+//   h1.style.color = 'red'
+//   setTimeout(() => {
+//     h1.style.color = 'orange'
+//     setTimeout(() => {
+//       h1.style.color = 'yellow'
+//       setTimeout(() => {
+//         h1.style.color = 'green'
+//       }, 1000)
+//     }, 1000)
+//   }, 1000)
+// }, 1000)
+
+function changeColor(el, color) {
+  return new Promise((resolve, reject) => {
+    setTimeout(() => {
+      el.style.color = color;
+      resolve()
+    }, 1000)
+  })
+}
+
+changeColor(h1, 'red')
+  .then(() => changeColor(h1, 'orange'))
+  .then(() => changeColor(h1, 'yellow'))
+  .then(() => changeColor(h1, 'green'))
+  .then(() => changeColor(h1, 'blue'))
+  .then(() => changeColor(h1, 'indigo'))
+  .then(() => changeColor(h1, 'violet'))
+```
+
+### Mock AJAX Promises:
+```js
+// let mockAjaxRequest = new Promise(function (resolve, reject) {
+//   let probSuccess = 0.5;
+//   let requestTime = 1000;
+
+//   // We mock a network request using a setTimeout.
+//   // The request takes requestTime milliseconds.
+//   // Afterwords, the promise is either resolved with data
+//   // or rejected with a timeout message,
+//   // based on whether randomNum is less than probSuccess.
+//   setTimeout(function () {
+//     let randomNum = Math.random();
+//     if (randomNum < probSuccess) {
+//       let data = "here's your data!";
+//       resolve(data);
+//     } else {
+//       reject("Sorry, your request failed.");
+//     }
+//   }, requestTime);
+// });
+
+function mockAjaxRequest() {
+  return new Promise(function (resolve, reject) {
+    let probSuccess = 0.5;
+    let requestTime = 1000;
+
+    // We mock a network request using a setTimeout.
+    // The request takes requestTime milliseconds.
+    // Afterwords, the promise is either resolved with data
+    // or rejected with a timeout message,
+    // based on whether randomNum is less than probSuccess.
+    setTimeout(function () {
+      let randomNum = Math.random();
+      if (randomNum < probSuccess) {
+        let data = "here's your data!";
+        resolve(data);
+      } else {
+        reject("Sorry, your request failed.");
+      }
+    }, requestTime);
+  })
+}
+mockAjaxRequest()
+  .then(data => {
+    console.log(data);
+    return mockAjaxRequest()
+  })
+  .then(data => {
+    console.log(data);
+  })
+  .catch(err => console.log(err))
+```
+
+### Recreating Axios:
+Axios Clone
+```js
+function get(url) {
+  const request = new XMLHttpRequest();
+  return new Promise((resolve, reject) => {
+    request.onload = function () {
+      if (request.readyState !== 4) return;
+
+      // Check status code
+      if (request.status >= 200 && request.status < 300) {
+        resolve({
+          data: JSON.parse(request.response),
+          status: request.status,
+          request: request,
+        })
+      } else {
+        reject({
+          msg: 'Server Error',
+          status: request.status,
+          request: request
+        })
+      }
+    }
+    request.onerror = function handleError() {
+      reject({
+        msg: 'NETWORK ERROR!'
+      })
+    };
+    request.open('GET', url);
+    request.send();
+  })
+}
+
+get('https://pokeapi.co/api/v2/pokemon/3')
+  .then(res => {
+    console.log(res)
+    return get('https://swapi.dev/api/planets/2/')
+  })
+  .then(res => console.log(res))
+  .catch(err => console.log(err))
+
+```
